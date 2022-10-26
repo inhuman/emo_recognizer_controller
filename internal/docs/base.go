@@ -1,6 +1,6 @@
-// Package classification Noise wrapper
+// Package classification Emotions recognizer
 //
-// Сервис шумоподавления
+// Сервис контроллер для распознавателя эмоций
 //
 //     Version: {{.version}}
 //

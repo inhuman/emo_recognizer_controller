@@ -4,19 +4,19 @@ import (
 	"bytes"
 )
 
-// swagger:route POST /api/v1/upload NoiseWrap uploadFile
+// swagger:route POST /api/v1/jobs Job createJob
 // Эндпоинт для загрузки звукового файла (.wav)
 //
 // Consumes:
 // - multipart/form-data
 //
 // responses:
-//   200: cleanSoundResponse
+//   200: createJobResponse
 //   400: badDataResponse
 //   500: internalErrorResponse
 
-// swagger:parameters uploadFile
-type uploadFileParams struct {
+// swagger:parameters createJob
+type createJobParams struct {
 	// Звуковой файл в формате wav
 	// in:formData
 	//
@@ -24,9 +24,11 @@ type uploadFileParams struct {
 	File *bytes.Buffer `json:"file"`
 }
 
-// swagger:response cleanSoundResponse
-type cleanSoundResponse struct {
-	// Результат очистки файла
+// swagger:response createJobResponse
+type createJobResponse struct {
+	// Результат создания задания на распознавание эмоций
 	// in:body
-	//Body noise_wrapper.ClearSoundResult
+	Body struct {
+		UUID string `json:"UUID"`
+	}
 }

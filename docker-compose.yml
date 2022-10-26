@@ -2,10 +2,11 @@ version: "3.9"
 services:
   controller:
     build: .
-    #    ports:
-    #      - "8000:5000"
+    ports:
+      - "8881:80"
     environment:
       PORT: 80
+      HOST: 0.0.0.0
   postgres:
     image: "postgres:9.6"
     environment:
@@ -17,9 +18,17 @@ services:
     command:
       - server
       - /data
+    ports:
+      - "9000:9000"
     environment:
       MINIO_ROOT_USER: root
       MINIO_ROOT_PASSWORD: root_password
   speech_recognizer:
     build: ./../speech-recognizer
+    environment:
+      PORT: 80
+      HOST: 0.0.0.0
+    ports:
+      - "8882:80"
+
 
