@@ -5,13 +5,19 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/sethvargo/go-envconfig"
 	"go.uber.org/zap"
+	"time"
 )
 
 type Config struct {
-	Port int `env:"PORT"`
+	Port         int `env:"PORT,default=80"`
+	JobProcessor JobProcessor
 	//Services Services
 	//Db       Database
 	//S3       S3
+}
+
+type JobProcessor struct {
+	FetchJobsPeriod time.Duration `env:"FETCH_JOBS_PERIOD,default=1m"`
 }
 
 type Services struct {

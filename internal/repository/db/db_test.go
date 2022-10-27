@@ -184,6 +184,24 @@ func TestRepository_UpdateStatusByUUID(t *testing.T) {
 	assert.Equal(t, jobs.JobStatusCancelled, status)
 }
 
+func TestRepository_GetJobToProcess(t *testing.T) {
+	contextWithTimeout, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	repo := NewRepository(pgxPool, logger)
+	defer func() {
+		cleanup(t, contextWithTimeout, "jobs")
+	}()
+
+	err := libpgx.QueryFromFile(pgxPool, "./../../../testdata/add_jobs.sql")
+	assert.NoError(t, err)
+
+	jobFromDb, err := repo.GetJobToProcess(contextWithTimeout)
+	assert.NoError(t, err)
+	assert.Equal(t, "af0748b4-621b-422a-a968-86e54bfd9372", jobFromDb.UUID)
+
+}
+
 func cleanup(t *testing.T, ctx context.Context, tableName string) {
 	_, err := pgxPool.Exec(ctx, fmt.Sprintf("TRUNCATE TABLE %s", tableName))
 	if err != nil {

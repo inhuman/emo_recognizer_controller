@@ -89,3 +89,7 @@ func QueryFromFile(pgxPool Pool, filePath string) error {
 
 	return nil
 }
+
+type Scanner interface {
+	Scan(dest ...interface{}) error
+}

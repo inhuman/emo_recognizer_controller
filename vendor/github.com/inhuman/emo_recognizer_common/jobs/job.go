@@ -23,3 +23,12 @@ type Job struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
+
+func StatusesToProcess() []JobStatus {
+	return []JobStatus{
+		JobStatusPlanned,
+		JobStatusNoiseWrapComplete,
+		JobStatusSpeechRecognizeComplete,
+	}
+
+}

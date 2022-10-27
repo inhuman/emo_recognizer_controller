@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/inhuman/emo_recognizer_common/jobs"
@@ -9,6 +10,7 @@ import (
 	"github.com/inhuman/emo_recognizer_controller/internal/repository"
 	"github.com/jackc/pgx/v4"
 	"go.uber.org/zap"
+	"strings"
 )
 
 const (
@@ -87,7 +89,7 @@ func applyFilterToQuery(query sq.SelectBuilder, filter repository.GetJobsFilter)
 	return query
 }
 
-func scanJob(row pgx.Rows) (*jobs.Job, error) {
+func scanJob(row libpgx.Scanner) (*jobs.Job, error) {
 	jobFromDB := jobs.Job{}
 
 	err := row.Scan(
@@ -106,16 +108,47 @@ WHERE uuid = $1;
 `
 
 func (r *Repository) GetJobByUUID(ctx context.Context, jobUUID string) (*jobs.Job, error) {
-	jobFromDb := jobs.Job{}
-
-	err := r.db.QueryRow(ctx, queryGetJobByUUID, jobUUID).
-		Scan(&jobFromDb.UUID, &jobFromDb.Status, &jobFromDb.Filename, &jobFromDb.CreatedAt, &jobFromDb.UpdatedAt)
+	row := r.db.QueryRow(ctx, queryGetJobByUUID, jobUUID)
+	jobFromDb, err := scanJob(row)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &jobFromDb, nil
+	return jobFromDb, nil
+}
+
+const queryGetJobToProcess = `
+SELECT "uuid", "status", "file_name", "created_at", "updated_at"
+FROM jobs
+WHERE "status" IN (%s)
+ORDER BY created_at
+LIMIT 1
+`
+
+func (r *Repository) GetJobToProcess(ctx context.Context) (*jobs.Job, error) {
+
+	var inClause string
+
+	statuses := jobs.StatusesToProcess()
+
+	for i := range statuses {
+		inClause += fmt.Sprintf(`'%s',`, statuses[i])
+	}
+
+	inClause = strings.TrimRight(inClause, ",")
+
+	row := r.db.QueryRow(ctx, fmt.Sprintf(queryGetJobToProcess, inClause))
+
+	jobFromDb, err := scanJob(row)
+	if err != nil {
+		return nil, err
+	}
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+		return nil, fmt.Errorf("failed to fetch job: %w", err)
+	}
+
+	return jobFromDb, nil
 }
 
 const queryCreateJob = `
