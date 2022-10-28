@@ -1,21 +1,23 @@
 package handlers
 
 import (
-	"github.com/inhuman/emo_recognizer_controller/internal/controller"
+	"github.com/inhuman/emo_recognizer_controller/internal/jobprocessor"
 	"github.com/inhuman/emo_recognizer_controller/pkg/gen/restapi/operations"
+	"go.uber.org/zap"
 )
-import "go.uber.org/zap"
 
 type SetupOpts struct {
 	Logger        *zap.Logger
-	JobsProcessor *controller.JobProcessor
+	JobsProcessor *jobprocessor.JobProcessor
 }
 
-func SetupAPI(api *operations.NoiseWrapperAPI, opts *SetupOpts) {
+func SetupAPI(api *operations.EmotionsRecognizerAPI, opts *SetupOpts) {
 	api.JobCreateJobHandler = NewUploadFileHandler(opts.Logger, opts.JobsProcessor)
+	api.JobGetJobsHandler = NewGetJobsHandler(opts.Logger, opts.JobsProcessor)
+	api.JobGetJobHandler = NewGetJobHandler(opts.Logger, opts.JobsProcessor)
 }
 
 type CommonHandler struct {
 	logger       *zap.Logger
-	jobProcessor *controller.JobProcessor
+	jobProcessor *jobprocessor.JobProcessor
 }

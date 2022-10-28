@@ -20,12 +20,55 @@ func init() {
 	SwaggerJSON = json.RawMessage([]byte(`{
   "swagger": "2.0",
   "info": {
-    "description": "Сервис шумоподавления",
-    "title": "Noise wrapper",
+    "description": "Сервис контроллер для распознавателя эмоций",
+    "title": "Emotions recognizer",
     "version": "{{.version}}"
   },
   "paths": {
     "/api/v1/jobs": {
+      "get": {
+        "description": "Эндпоинт для получения списка задач на обработку",
+        "tags": [
+          "Job"
+        ],
+        "operationId": "getJobs",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "Status",
+            "description": "Status",
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Limit",
+            "description": "Limit",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Offset",
+            "description": "Offset",
+            "name": "offset",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getJobsResponse"
+          },
+          "400": {
+            "$ref": "#/responses/badDataResponse"
+          },
+          "500": {
+            "$ref": "#/responses/internalErrorResponse"
+          }
+        }
+      },
       "post": {
         "description": "Эндпоинт для загрузки звукового файла (.wav)",
         "consumes": [
@@ -56,9 +99,68 @@ func init() {
           }
         }
       }
+    },
+    "/api/v1/jobs/{Uuid}": {
+      "get": {
+        "description": "Эндпоинт для получения задачи по UUID",
+        "tags": [
+          "Job"
+        ],
+        "operationId": "getJob",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Uuid задания",
+            "name": "Uuid",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getJobResponse"
+          },
+          "400": {
+            "$ref": "#/responses/badDataResponse"
+          },
+          "404": {
+            "$ref": "#/responses/notFoundResponse"
+          },
+          "500": {
+            "$ref": "#/responses/internalErrorResponse"
+          }
+        }
+      }
     }
   },
   "definitions": {
+    "Job": {
+      "type": "object",
+      "properties": {
+        "CreatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "Filename": {
+          "type": "string"
+        },
+        "Status": {
+          "$ref": "#/definitions/JobStatus"
+        },
+        "UUID": {
+          "type": "string"
+        },
+        "UpdatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "x-go-package": "github.com/inhuman/emo_recognizer_common/jobs"
+    },
+    "JobStatus": {
+      "type": "string",
+      "x-go-package": "github.com/inhuman/emo_recognizer_common/jobs"
+    },
     "commonErrorResponse": {
       "type": "object",
       "properties": {
@@ -101,6 +203,21 @@ func init() {
         }
       }
     },
+    "getJobResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Job"
+      }
+    },
+    "getJobsResponse": {
+      "description": "",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/Job"
+        }
+      }
+    },
     "internalErrorResponse": {
       "description": "Internal server error (500)",
       "schema": {
@@ -130,12 +247,67 @@ func init() {
 	FlatSwaggerJSON = json.RawMessage([]byte(`{
   "swagger": "2.0",
   "info": {
-    "description": "Сервис шумоподавления",
-    "title": "Noise wrapper",
+    "description": "Сервис контроллер для распознавателя эмоций",
+    "title": "Emotions recognizer",
     "version": "{{.version}}"
   },
   "paths": {
     "/api/v1/jobs": {
+      "get": {
+        "description": "Эндпоинт для получения списка задач на обработку",
+        "tags": [
+          "Job"
+        ],
+        "operationId": "getJobs",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "Status",
+            "description": "Status",
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Limit",
+            "description": "Limit",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Offset",
+            "description": "Offset",
+            "name": "offset",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Job"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad data (400)",
+            "schema": {
+              "$ref": "#/definitions/commonErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal server error (500)",
+            "schema": {
+              "$ref": "#/definitions/commonErrorResponse"
+            }
+          }
+        }
+      },
       "post": {
         "description": "Эндпоинт для загрузки звукового файла (.wav)",
         "consumes": [
@@ -180,9 +352,80 @@ func init() {
           }
         }
       }
+    },
+    "/api/v1/jobs/{Uuid}": {
+      "get": {
+        "description": "Эндпоинт для получения задачи по UUID",
+        "tags": [
+          "Job"
+        ],
+        "operationId": "getJob",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Uuid задания",
+            "name": "Uuid",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Job"
+            }
+          },
+          "400": {
+            "description": "Bad data (400)",
+            "schema": {
+              "$ref": "#/definitions/commonErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not found (404)",
+            "schema": {
+              "$ref": "#/definitions/commonErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal server error (500)",
+            "schema": {
+              "$ref": "#/definitions/commonErrorResponse"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
+    "Job": {
+      "type": "object",
+      "properties": {
+        "CreatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "Filename": {
+          "type": "string"
+        },
+        "Status": {
+          "$ref": "#/definitions/JobStatus"
+        },
+        "UUID": {
+          "type": "string"
+        },
+        "UpdatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "x-go-package": "github.com/inhuman/emo_recognizer_common/jobs"
+    },
+    "JobStatus": {
+      "type": "string",
+      "x-go-package": "github.com/inhuman/emo_recognizer_common/jobs"
+    },
     "commonErrorResponse": {
       "type": "object",
       "properties": {
@@ -222,6 +465,21 @@ func init() {
           "UUID": {
             "type": "string"
           }
+        }
+      }
+    },
+    "getJobResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Job"
+      }
+    },
+    "getJobsResponse": {
+      "description": "",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/Job"
         }
       }
     },

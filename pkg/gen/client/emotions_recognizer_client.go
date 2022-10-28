@@ -13,7 +13,7 @@ import (
 	"github.com/inhuman/emo_recognizer_controller/pkg/gen/client/job"
 )
 
-// Default noise wrapper HTTP client.
+// Default emotions recognizer HTTP client.
 var Default = NewHTTPClient(nil)
 
 const (
@@ -28,14 +28,14 @@ const (
 // DefaultSchemes are the default schemes found in Meta (info) section of spec file
 var DefaultSchemes = []string{"http"}
 
-// NewHTTPClient creates a new noise wrapper HTTP client.
-func NewHTTPClient(formats strfmt.Registry) *NoiseWrapper {
+// NewHTTPClient creates a new emotions recognizer HTTP client.
+func NewHTTPClient(formats strfmt.Registry) *EmotionsRecognizer {
 	return NewHTTPClientWithConfig(formats, nil)
 }
 
-// NewHTTPClientWithConfig creates a new noise wrapper HTTP client,
+// NewHTTPClientWithConfig creates a new emotions recognizer HTTP client,
 // using a customizable transport config.
-func NewHTTPClientWithConfig(formats strfmt.Registry, cfg *TransportConfig) *NoiseWrapper {
+func NewHTTPClientWithConfig(formats strfmt.Registry, cfg *TransportConfig) *EmotionsRecognizer {
 	// ensure nullable parameters have default
 	if cfg == nil {
 		cfg = DefaultTransportConfig()
@@ -46,14 +46,14 @@ func NewHTTPClientWithConfig(formats strfmt.Registry, cfg *TransportConfig) *Noi
 	return New(transport, formats)
 }
 
-// New creates a new noise wrapper client
-func New(transport runtime.ClientTransport, formats strfmt.Registry) *NoiseWrapper {
+// New creates a new emotions recognizer client
+func New(transport runtime.ClientTransport, formats strfmt.Registry) *EmotionsRecognizer {
 	// ensure nullable parameters have default
 	if formats == nil {
 		formats = strfmt.Default
 	}
 
-	cli := new(NoiseWrapper)
+	cli := new(EmotionsRecognizer)
 	cli.Transport = transport
 	cli.Job = job.New(transport, formats)
 	return cli
@@ -98,15 +98,15 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 	return cfg
 }
 
-// NoiseWrapper is a client for noise wrapper
-type NoiseWrapper struct {
+// EmotionsRecognizer is a client for emotions recognizer
+type EmotionsRecognizer struct {
 	Job job.ClientService
 
 	Transport runtime.ClientTransport
 }
 
 // SetTransport changes the transport on the client and all its subresources
-func (c *NoiseWrapper) SetTransport(transport runtime.ClientTransport) {
+func (c *EmotionsRecognizer) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
 	c.Job.SetTransport(transport)
 }

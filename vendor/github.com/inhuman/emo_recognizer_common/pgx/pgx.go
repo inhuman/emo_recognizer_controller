@@ -7,6 +7,7 @@ import (
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -92,4 +93,14 @@ func QueryFromFile(pgxPool Pool, filePath string) error {
 
 type Scanner interface {
 	Scan(dest ...interface{}) error
+}
+
+func ToInClause(t ...fmt.Stringer) string {
+	inClause := ""
+
+	for i := range t {
+		inClause += fmt.Sprintf(`"%s",`, t[i])
+	}
+
+	return strings.TrimRight(inClause, ",")
 }

@@ -7,12 +7,18 @@ services:
     environment:
       PORT: 80
       HOST: 0.0.0.0
+      PGHOST: postgres
+      PGPORT: 5432
+      PGUSER: postgres
+      PGDATABASE: postgres
+      PGPASSWORD: 123
   postgres:
     image: "postgres:9.6"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres
       POSTGRES_PASSWORD: 123
+      APPLY_MIGRATIONS: "true"
   s3:
     image: "minio/minio:latest"
     command:

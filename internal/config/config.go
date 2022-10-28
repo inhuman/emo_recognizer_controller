@@ -2,18 +2,22 @@ package config
 
 import (
 	"context"
+	"time"
+
 	"github.com/joho/godotenv"
 	"github.com/sethvargo/go-envconfig"
 	"go.uber.org/zap"
-	"time"
 )
 
 type Config struct {
-	Port         int `env:"PORT,default=80"`
-	JobProcessor JobProcessor
-	//Services Services
-	//Db       Database
-	//S3       S3
+	Port              int `env:"PORT,default=80"`
+	Db                Database
+	JobProcessor      JobProcessor
+	ApplyDbMigrations bool   `env:"APPLY_MIGRATIONS,default=false"`
+	MigrationsPath    string `env:"MIGRATIONS_PATH,default=/migrations"`
+
+	// Services Services
+	// S3       S3
 }
 
 type JobProcessor struct {
@@ -26,10 +30,12 @@ type Services struct {
 }
 
 type Database struct {
-	Host   string `env:"PGHOST"`
-	Port   int    `env:"PGPORT"`
-	User   string `env:"PGUSER"`
-	DbName string `env:"PGDATABASE"`
+	Host     string `env:"PGHOST"`
+	Port     int    `env:"PGPORT"`
+	User     string `env:"PGUSER"`
+	DbName   string `env:"PGDATABASE"`
+	Password string `env:"PGPASSWORD"`
+	SslMode  string `env:"PGSSLMODE,default=disable"`
 }
 
 type S3 struct {

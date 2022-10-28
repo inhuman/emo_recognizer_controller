@@ -1,11 +1,12 @@
-package controller
+package jobprocessor
 
 import (
 	"context"
+	"time"
+
 	"github.com/inhuman/emo_recognizer_controller/internal/config"
 	"github.com/inhuman/emo_recognizer_controller/internal/repository"
 	"go.uber.org/zap"
-	"time"
 )
 
 type JobProcessor struct {
@@ -14,8 +15,19 @@ type JobProcessor struct {
 	strategyChooser ProcessStrategyChooser
 }
 
-func (jp *JobProcessor) Run(ctx context.Context, conf config.JobProcessor) {
+func NewJobProcessor(repo repository.Repository, logger *zap.Logger, strategyChooser ProcessStrategyChooser) *JobProcessor {
+	return &JobProcessor{
+		repo:            repo,
+		logger:          logger,
+		strategyChooser: strategyChooser,
+	}
+}
 
+func (jp *JobProcessor) Repo() repository.Repository {
+	return jp.repo
+}
+
+func (jp *JobProcessor) Run(ctx context.Context, conf config.JobProcessor) {
 	ticker := time.NewTicker(conf.FetchJobsPeriod)
 
 	for {

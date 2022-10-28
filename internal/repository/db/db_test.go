@@ -3,6 +3,9 @@ package db
 import (
 	"context"
 	"fmt"
+	"testing"
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/inhuman/emo_recognizer_common/dockerpg"
 	"github.com/inhuman/emo_recognizer_common/jobs"
@@ -11,8 +14,6 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
-	"testing"
-	"time"
 )
 
 var (
@@ -81,7 +82,6 @@ func TestMain(m *testing.M) {
 }
 
 func TestRepository_CreateJob(t *testing.T) {
-
 	contextWithTimeout, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
@@ -199,7 +199,6 @@ func TestRepository_GetJobToProcess(t *testing.T) {
 	jobFromDb, err := repo.GetJobToProcess(contextWithTimeout)
 	assert.NoError(t, err)
 	assert.Equal(t, "af0748b4-621b-422a-a968-86e54bfd9372", jobFromDb.UUID)
-
 }
 
 func cleanup(t *testing.T, ctx context.Context, tableName string) {

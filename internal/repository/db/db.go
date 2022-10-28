@@ -4,13 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
+
 	sq "github.com/Masterminds/squirrel"
 	"github.com/inhuman/emo_recognizer_common/jobs"
 	libpgx "github.com/inhuman/emo_recognizer_common/pgx"
 	"github.com/inhuman/emo_recognizer_controller/internal/repository"
 	"github.com/jackc/pgx/v4"
 	"go.uber.org/zap"
-	"strings"
 )
 
 const (
@@ -110,7 +111,6 @@ WHERE uuid = $1;
 func (r *Repository) GetJobByUUID(ctx context.Context, jobUUID string) (*jobs.Job, error) {
 	row := r.db.QueryRow(ctx, queryGetJobByUUID, jobUUID)
 	jobFromDb, err := scanJob(row)
-
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +127,6 @@ LIMIT 1
 `
 
 func (r *Repository) GetJobToProcess(ctx context.Context) (*jobs.Job, error) {
-
 	var inClause string
 
 	statuses := jobs.StatusesToProcess()

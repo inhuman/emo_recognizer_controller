@@ -1,9 +1,10 @@
-package controller
+package jobprocessor
 
 import (
+	"sync"
+
 	"github.com/inhuman/emo_recognizer_common/jobs"
 	"github.com/inhuman/emo_recognizer_controller/internal/repository"
-	"sync"
 )
 
 type StrategyName string
@@ -30,7 +31,9 @@ func (s *StrategyChooser) AddStrategy(name StrategyName, strategy ProcessStrateg
 }
 
 func NewStrategyChooser() *StrategyChooser {
-	return &StrategyChooser{}
+	return &StrategyChooser{
+		strategies: make(map[StrategyName]ProcessStrategy),
+	}
 }
 
 func (s *StrategyChooser) ChooseStrategy(jobToProcess *jobs.Job) ProcessStrategy {
@@ -57,9 +60,9 @@ func NewDefaultStrategy() *DefaultStrategy {
 func (d *DefaultStrategy) Process(jobToProcess *jobs.Job) error {
 	switch jobToProcess.Status {
 	case jobs.JobStatusPlanned:
-		//TODO: to noise wrapper
+		// TODO: to noise wrapper
 	case jobs.JobStatusNoiseWrapComplete:
-		//TODO: to speech recognizer
+		// TODO: to speech recognizer
 	}
 
 	return nil

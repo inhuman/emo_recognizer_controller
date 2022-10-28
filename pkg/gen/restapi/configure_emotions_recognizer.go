@@ -15,11 +15,11 @@ import (
 	"github.com/inhuman/emo_recognizer_controller/pkg/gen/restapi/operations/job"
 )
 
-func configureFlags(api *operations.NoiseWrapperAPI) {
+func configureFlags(api *operations.EmotionsRecognizerAPI) {
 	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }
 }
 
-func configureAPI(api *operations.NoiseWrapperAPI) http.Handler {
+func configureAPI(api *operations.EmotionsRecognizerAPI) http.Handler {
 	// configure the api here
 	api.ServeError = errors.ServeError
 
@@ -43,6 +43,16 @@ func configureAPI(api *operations.NoiseWrapperAPI) http.Handler {
 	if api.JobCreateJobHandler == nil {
 		api.JobCreateJobHandler = job.CreateJobHandlerFunc(func(params job.CreateJobParams) middleware.Responder {
 			return middleware.NotImplemented("operation job.CreateJob has not yet been implemented")
+		})
+	}
+	if api.JobGetJobHandler == nil {
+		api.JobGetJobHandler = job.GetJobHandlerFunc(func(params job.GetJobParams) middleware.Responder {
+			return middleware.NotImplemented("operation job.GetJob has not yet been implemented")
+		})
+	}
+	if api.JobGetJobsHandler == nil {
+		api.JobGetJobsHandler = job.GetJobsHandlerFunc(func(params job.GetJobsParams) middleware.Responder {
+			return middleware.NotImplemented("operation job.GetJobs has not yet been implemented")
 		})
 	}
 

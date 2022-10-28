@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+
 	"github.com/inhuman/emo_recognizer_common/jobs"
 )
 
