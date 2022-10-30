@@ -12,13 +12,20 @@ services:
       PGUSER: postgres
       PGDATABASE: postgres
       PGPASSWORD: 123
+      APPLY_MIGRATIONS: "true"
+      S3_ENDPOINT: "s3:9000"
+      S3_ACCESS_KEY: root
+      S3_SECRET_KEY: root_password
+      S3_BUCKET_NAME: test
+      S3_PUBLIC_HOST_ADDR: s3.local
+      S3_PUBLIC_HOST_SCHEMA: http
+      S3_SECURE: "false"
   postgres:
     image: "postgres:9.6"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres
       POSTGRES_PASSWORD: 123
-      APPLY_MIGRATIONS: "true"
   s3:
     image: "minio/minio:latest"
     command:
@@ -38,3 +45,5 @@ services:
       - "8882:80"
 
 
+// TODO: fix this
+  {"level":"panic","msg":"can not start app","error":"failed check bucket exists: Get \"https://s3:9000/test/?location=\": http: server gave HTTP response to HTTPS client"}

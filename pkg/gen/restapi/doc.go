@@ -13,7 +13,7 @@
 //	  - multipart/form-data
 //
 //	Produces:
-//	  - application/json
+//	  - application/octet-stream
 //
 // swagger:meta
 package restapi

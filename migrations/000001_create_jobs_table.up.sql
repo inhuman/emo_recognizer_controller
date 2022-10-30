@@ -7,6 +7,7 @@ $$
             CREATE TYPE jobStatus AS ENUM
                 (
                     'planned',
+                    'file_uploaded',
                     'noise_wrap_started',
                     'noise_wrap_complete',
                     'noise_wrap_error',

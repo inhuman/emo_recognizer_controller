@@ -131,6 +131,41 @@ func init() {
           }
         }
       }
+    },
+    "/api/v1/jobs/{Uuid}/file/original": {
+      "get": {
+        "description": "Эндпоинт для получения файла задачи по UUID",
+        "produces": [
+          "application/octet-stream"
+        ],
+        "tags": [
+          "Job"
+        ],
+        "operationId": "getJobOriginalFile",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Uuid задания",
+            "name": "Uuid",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getJobOriginalFileResponse"
+          },
+          "400": {
+            "$ref": "#/responses/badDataResponse"
+          },
+          "404": {
+            "$ref": "#/responses/notFoundResponse"
+          },
+          "500": {
+            "$ref": "#/responses/internalErrorResponse"
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -160,6 +195,12 @@ func init() {
     "JobStatus": {
       "type": "string",
       "x-go-package": "github.com/inhuman/emo_recognizer_common/jobs"
+    },
+    "Reader": {
+      "description": "Read reads up to len(p) bytes into p. It returns the number of bytes\nread (0 \u003c= n \u003c= len(p)) and any error encountered. Even if Read\nreturns n \u003c len(p), it may use all of p as scratch space during the call.\nIf some data is available but not len(p) bytes, Read conventionally\nreturns what is available instead of waiting for more.\n\nWhen Read encounters an error or end-of-file condition after\nsuccessfully reading n \u003e 0 bytes, it returns the number of\nbytes read. It may return the (non-nil) error from the same call\nor return the error (and n == 0) from a subsequent call.\nAn instance of this general case is that a Reader returning\na non-zero number of bytes at the end of the input stream may\nreturn either err == EOF or err == nil. The next Read should\nreturn 0, EOF.\n\nCallers should always process the n \u003e 0 bytes returned before\nconsidering the error err. Doing so correctly handles I/O errors\nthat happen after reading some bytes and also both of the\nallowed EOF behaviors.\n\nImplementations of Read are discouraged from returning a\nzero byte count with a nil error, except when len(p) == 0.\nCallers should treat a return of 0 and nil as indicating that\nnothing happened; in particular it does not indicate EOF.\n\nImplementations must not retain p.",
+      "type": "object",
+      "title": "Reader is the interface that wraps the basic Read method.",
+      "x-go-package": "io"
     },
     "commonErrorResponse": {
       "type": "object",
@@ -201,6 +242,12 @@ func init() {
             "type": "string"
           }
         }
+      }
+    },
+    "getJobOriginalFileResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Reader"
       }
     },
     "getJobResponse": {
@@ -396,6 +443,53 @@ func init() {
           }
         }
       }
+    },
+    "/api/v1/jobs/{Uuid}/file/original": {
+      "get": {
+        "description": "Эндпоинт для получения файла задачи по UUID",
+        "produces": [
+          "application/octet-stream"
+        ],
+        "tags": [
+          "Job"
+        ],
+        "operationId": "getJobOriginalFile",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Uuid задания",
+            "name": "Uuid",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Reader"
+            }
+          },
+          "400": {
+            "description": "Bad data (400)",
+            "schema": {
+              "$ref": "#/definitions/commonErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not found (404)",
+            "schema": {
+              "$ref": "#/definitions/commonErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal server error (500)",
+            "schema": {
+              "$ref": "#/definitions/commonErrorResponse"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -425,6 +519,12 @@ func init() {
     "JobStatus": {
       "type": "string",
       "x-go-package": "github.com/inhuman/emo_recognizer_common/jobs"
+    },
+    "Reader": {
+      "description": "Read reads up to len(p) bytes into p. It returns the number of bytes\nread (0 \u003c= n \u003c= len(p)) and any error encountered. Even if Read\nreturns n \u003c len(p), it may use all of p as scratch space during the call.\nIf some data is available but not len(p) bytes, Read conventionally\nreturns what is available instead of waiting for more.\n\nWhen Read encounters an error or end-of-file condition after\nsuccessfully reading n \u003e 0 bytes, it returns the number of\nbytes read. It may return the (non-nil) error from the same call\nor return the error (and n == 0) from a subsequent call.\nAn instance of this general case is that a Reader returning\na non-zero number of bytes at the end of the input stream may\nreturn either err == EOF or err == nil. The next Read should\nreturn 0, EOF.\n\nCallers should always process the n \u003e 0 bytes returned before\nconsidering the error err. Doing so correctly handles I/O errors\nthat happen after reading some bytes and also both of the\nallowed EOF behaviors.\n\nImplementations of Read are discouraged from returning a\nzero byte count with a nil error, except when len(p) == 0.\nCallers should treat a return of 0 and nil as indicating that\nnothing happened; in particular it does not indicate EOF.\n\nImplementations must not retain p.",
+      "type": "object",
+      "title": "Reader is the interface that wraps the basic Read method.",
+      "x-go-package": "io"
     },
     "commonErrorResponse": {
       "type": "object",
@@ -466,6 +566,12 @@ func init() {
             "type": "string"
           }
         }
+      }
+    },
+    "getJobOriginalFileResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Reader"
       }
     },
     "getJobResponse": {

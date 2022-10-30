@@ -35,7 +35,7 @@ func configureAPI(api *operations.EmotionsRecognizerAPI) http.Handler {
 
 	api.MultipartformConsumer = runtime.DiscardConsumer
 
-	api.JSONProducer = runtime.JSONProducer()
+	api.BinProducer = runtime.ByteStreamProducer()
 
 	// You may change here the memory limit for this multipart form parser. Below is the default (32 MB).
 	// job.CreateJobMaxParseMemory = 32 << 20
@@ -48,6 +48,11 @@ func configureAPI(api *operations.EmotionsRecognizerAPI) http.Handler {
 	if api.JobGetJobHandler == nil {
 		api.JobGetJobHandler = job.GetJobHandlerFunc(func(params job.GetJobParams) middleware.Responder {
 			return middleware.NotImplemented("operation job.GetJob has not yet been implemented")
+		})
+	}
+	if api.JobGetJobOriginalFileHandler == nil {
+		api.JobGetJobOriginalFileHandler = job.GetJobOriginalFileHandlerFunc(func(params job.GetJobOriginalFileParams) middleware.Responder {
+			return middleware.NotImplemented("operation job.GetJobOriginalFile has not yet been implemented")
 		})
 	}
 	if api.JobGetJobsHandler == nil {

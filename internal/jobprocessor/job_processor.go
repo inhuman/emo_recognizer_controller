@@ -2,6 +2,7 @@ package jobprocessor
 
 import (
 	"context"
+	"io"
 	"time"
 
 	"github.com/inhuman/emo_recognizer_controller/internal/config"
@@ -13,18 +14,31 @@ type JobProcessor struct {
 	repo            repository.Repository
 	logger          *zap.Logger
 	strategyChooser ProcessStrategyChooser
+	fileStorage     Storage
 }
 
-func NewJobProcessor(repo repository.Repository, logger *zap.Logger, strategyChooser ProcessStrategyChooser) *JobProcessor {
+type Opts struct {
+	Repo            repository.Repository
+	Logger          *zap.Logger
+	StrategyChooser ProcessStrategyChooser
+	FileStorage     Storage
+}
+
+func NewJobProcessor(opts Opts) *JobProcessor {
 	return &JobProcessor{
-		repo:            repo,
-		logger:          logger,
-		strategyChooser: strategyChooser,
+		repo:            opts.Repo,
+		logger:          opts.Logger,
+		strategyChooser: opts.StrategyChooser,
+		fileStorage:     opts.FileStorage,
 	}
 }
 
 func (jp *JobProcessor) Repo() repository.Repository {
 	return jp.repo
+}
+
+func (jp *JobProcessor) FileStorage() Storage {
+	return jp.fileStorage
 }
 
 func (jp *JobProcessor) Run(ctx context.Context, conf config.JobProcessor) {
@@ -74,4 +88,10 @@ func (jp *JobProcessor) Run(ctx context.Context, conf config.JobProcessor) {
 			return
 		}
 	}
+}
+
+type Storage interface {
+	Write(ctx context.Context, fileName string, size int64, r io.Reader) (err error)
+	Read(ctx context.Context, fileName string) (io.Reader, error)
+	GetPublicURLByFileName(fileName string) string
 }

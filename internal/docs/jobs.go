@@ -2,6 +2,7 @@ package docs
 
 import (
 	"bytes"
+	"io"
 
 	"github.com/inhuman/emo_recognizer_common/jobs"
 )
@@ -87,4 +88,30 @@ type getJobResponse struct {
 	// Задание на обработку
 	// in:body
 	Body jobs.Job
+}
+
+// swagger:route GET /api/v1/jobs/{Uuid}/file/original Job getJobOriginalFile
+// Эндпоинт для получения файла задачи по UUID
+//
+// Produces:
+// - application/octet-stream
+//
+// responses:
+//   200: getJobOriginalFileResponse
+//   400: badDataResponse
+//	 404: notFoundResponse
+//   500: internalErrorResponse
+
+// swagger:parameters getJobOriginalFile
+type getJobFileParams struct {
+	// Uuid задания
+	// in:path
+	Uuid string
+}
+
+// swagger:response getJobOriginalFileResponse
+type getJobFileResponse struct {
+	// Задание на обработку
+	// in:body
+	Body io.Reader
 }

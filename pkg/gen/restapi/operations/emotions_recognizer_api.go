@@ -42,13 +42,16 @@ func NewEmotionsRecognizerAPI(spec *loads.Document) *EmotionsRecognizerAPI {
 
 		MultipartformConsumer: runtime.DiscardConsumer,
 
-		JSONProducer: runtime.JSONProducer(),
+		BinProducer: runtime.ByteStreamProducer(),
 
 		JobCreateJobHandler: job.CreateJobHandlerFunc(func(params job.CreateJobParams) middleware.Responder {
 			return middleware.NotImplemented("operation job.CreateJob has not yet been implemented")
 		}),
 		JobGetJobHandler: job.GetJobHandlerFunc(func(params job.GetJobParams) middleware.Responder {
 			return middleware.NotImplemented("operation job.GetJob has not yet been implemented")
+		}),
+		JobGetJobOriginalFileHandler: job.GetJobOriginalFileHandlerFunc(func(params job.GetJobOriginalFileParams) middleware.Responder {
+			return middleware.NotImplemented("operation job.GetJobOriginalFile has not yet been implemented")
 		}),
 		JobGetJobsHandler: job.GetJobsHandlerFunc(func(params job.GetJobsParams) middleware.Responder {
 			return middleware.NotImplemented("operation job.GetJobs has not yet been implemented")
@@ -85,14 +88,16 @@ type EmotionsRecognizerAPI struct {
 	//   - multipart/form-data
 	MultipartformConsumer runtime.Consumer
 
-	// JSONProducer registers a producer for the following mime types:
-	//   - application/json
-	JSONProducer runtime.Producer
+	// BinProducer registers a producer for the following mime types:
+	//   - application/octet-stream
+	BinProducer runtime.Producer
 
 	// JobCreateJobHandler sets the operation handler for the create job operation
 	JobCreateJobHandler job.CreateJobHandler
 	// JobGetJobHandler sets the operation handler for the get job operation
 	JobGetJobHandler job.GetJobHandler
+	// JobGetJobOriginalFileHandler sets the operation handler for the get job original file operation
+	JobGetJobOriginalFileHandler job.GetJobOriginalFileHandler
 	// JobGetJobsHandler sets the operation handler for the get jobs operation
 	JobGetJobsHandler job.GetJobsHandler
 
@@ -168,8 +173,8 @@ func (o *EmotionsRecognizerAPI) Validate() error {
 		unregistered = append(unregistered, "MultipartformConsumer")
 	}
 
-	if o.JSONProducer == nil {
-		unregistered = append(unregistered, "JSONProducer")
+	if o.BinProducer == nil {
+		unregistered = append(unregistered, "BinProducer")
 	}
 
 	if o.JobCreateJobHandler == nil {
@@ -177,6 +182,9 @@ func (o *EmotionsRecognizerAPI) Validate() error {
 	}
 	if o.JobGetJobHandler == nil {
 		unregistered = append(unregistered, "job.GetJobHandler")
+	}
+	if o.JobGetJobOriginalFileHandler == nil {
+		unregistered = append(unregistered, "job.GetJobOriginalFileHandler")
 	}
 	if o.JobGetJobsHandler == nil {
 		unregistered = append(unregistered, "job.GetJobsHandler")
@@ -227,8 +235,8 @@ func (o *EmotionsRecognizerAPI) ProducersFor(mediaTypes []string) map[string]run
 	result := make(map[string]runtime.Producer, len(mediaTypes))
 	for _, mt := range mediaTypes {
 		switch mt {
-		case "application/json":
-			result["application/json"] = o.JSONProducer
+		case "application/octet-stream":
+			result["application/octet-stream"] = o.BinProducer
 		}
 
 		if p, ok := o.customProducers[mt]; ok {
@@ -277,6 +285,10 @@ func (o *EmotionsRecognizerAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/api/v1/jobs/{Uuid}"] = job.NewGetJob(o.context, o.JobGetJobHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/api/v1/jobs/{Uuid}/file/original"] = job.NewGetJobOriginalFile(o.context, o.JobGetJobOriginalFileHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

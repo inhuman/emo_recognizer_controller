@@ -7,7 +7,12 @@ import (
 
 	"github.com/go-openapi/loads"
 	"github.com/golang-migrate/migrate/v4"
+
+	// drivers needed
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	libpgx "github.com/inhuman/emo_recognizer_common/pgx"
+	"github.com/inhuman/emo_recognizer_common/storage/s3"
 	"github.com/inhuman/emo_recognizer_controller/internal/config"
 	"github.com/inhuman/emo_recognizer_controller/internal/handlers"
 	"github.com/inhuman/emo_recognizer_controller/internal/jobprocessor"
@@ -33,6 +38,10 @@ func main() {
 	pgxPool := preparePg(ctx, appConfig.Db, logger)
 
 	if appConfig.ApplyDbMigrations {
+		logger.Info("applying db migrations",
+			zap.String("migrations path", appConfig.MigrationsPath),
+		)
+
 		databaseURL := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=%s",
 			appConfig.Db.User,
 			appConfig.Db.Password,
@@ -46,7 +55,9 @@ func main() {
 		panicErr(err, logger)
 
 		err = migrator.Up()
-		panicErr(err, logger)
+		if !errors.Is(err, migrate.ErrNoChange) {
+			panicErr(err, logger)
+		}
 	}
 
 	dbRepo := db.NewRepository(pgxPool, logger)
@@ -54,7 +65,21 @@ func main() {
 	strategyChooser := jobprocessor.NewStrategyChooser()
 	strategyChooser.AddStrategy(jobprocessor.StrategyDefault, jobprocessor.NewDefaultStrategy())
 
-	jobsProcessor := jobprocessor.NewJobProcessor(dbRepo, logger, strategyChooser)
+	fileStorage, err := s3.NewS3(
+		s3.WithEndpoint(appConfig.S3.Endpoint),
+		s3.WithBucketName(appConfig.S3.Bucket),
+		s3.WithAccessKey(appConfig.S3.AccessKey),
+		s3.WithSecretKey(appConfig.S3.SecretKey),
+		s3.WithCreateBucket(true),
+	)
+	panicErr(err, logger)
+
+	jobsProcessor := jobprocessor.NewJobProcessor(jobprocessor.Opts{
+		Repo:            dbRepo,
+		Logger:          logger,
+		StrategyChooser: strategyChooser,
+		FileStorage:     fileStorage,
+	})
 
 	api := operations.NewEmotionsRecognizerAPI(swaggerSpec)
 

@@ -13,11 +13,12 @@ type Config struct {
 	Port              int `env:"PORT,default=80"`
 	Db                Database
 	JobProcessor      JobProcessor
+	S3                S3
 	ApplyDbMigrations bool   `env:"APPLY_MIGRATIONS,default=false"`
-	MigrationsPath    string `env:"MIGRATIONS_PATH,default=/migrations"`
+	MigrationsPath    string `env:"MIGRATIONS_PATH,default=file:///migrations/"`
 
 	// Services Services
-	// S3       S3
+
 }
 
 type JobProcessor struct {
@@ -40,8 +41,8 @@ type Database struct {
 
 type S3 struct {
 	Endpoint         string `env:"S3_ENDPOINT"`
-	AccessKey        string `env:"=3BIaGF7ba4o8j5BltAtx"`
-	SecretKey        string `env:"S3_SECRET_ACCESS_KEY"`
+	AccessKey        string `env:"S3_ACCESS_KEY"`
+	SecretKey        string `env:"S3_SECRET_KEY"`
 	Bucket           string `env:"S3_BUCKET_NAME"`
 	PublicHostAddr   string `env:"S3_PUBLIC_HOST_ADDR"`
 	PublicHostSchema string `env:"S3_PUBLIC_HOST_SCHEMA"`
