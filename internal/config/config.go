@@ -14,20 +14,26 @@ type Config struct {
 	Db                Database
 	JobProcessor      JobProcessor
 	S3                S3
+	Services          Services
 	ApplyDbMigrations bool   `env:"APPLY_MIGRATIONS,default=false"`
 	MigrationsPath    string `env:"MIGRATIONS_PATH,default=file:///migrations/"`
-
-	// Services Services
-
 }
 
 type JobProcessor struct {
-	FetchJobsPeriod time.Duration `env:"FETCH_JOBS_PERIOD,default=1m"`
+	FetchJobsPeriod time.Duration `env:"FETCH_JOBS_PERIOD,default=10s"`
 }
 
 type Services struct {
-	NoiseWrapperAddress     string `env:"NOISE_WRAPPER_ADDRESS"`
-	SpeechRecognizerAddress string `env:"SPEECH_RECOGNIZER_ADDRESS"`
+	NoiseWrapper     NoiseWrapper
+	SpeechRecognizer SpeechRecognizer
+}
+
+type NoiseWrapper struct {
+	Address string `env:"NOISE_WRAPPER_ADDRESS"`
+}
+
+type SpeechRecognizer struct {
+	Address string `env:"SPEECH_RECOGNIZER_ADDRESS"`
 }
 
 type Database struct {

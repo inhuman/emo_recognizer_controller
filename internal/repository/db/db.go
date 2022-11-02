@@ -54,7 +54,7 @@ func (r *Repository) GetJobs(ctx context.Context, filter repository.GetJobsFilte
 }
 
 func getQueryGetJobs(filter repository.GetJobsFilter) (queryString string, args []interface{}, err error) {
-	query := sq.Select("uuid", "status", "file_name", "created_at", "updated_at").
+	query := sq.Select("uuid", "status", "file_name", "strategy", "created_at", "updated_at").
 		From("jobs")
 
 	query = query.PlaceholderFormat(sq.Dollar)
@@ -76,6 +76,10 @@ func applyFilterToQuery(query sq.SelectBuilder, filter repository.GetJobsFilter)
 		query = query.Where(sq.Eq{"status": filter.Status})
 	}
 
+	if filter.Strategy != "" {
+		query = query.Where(sq.Eq{"strategy": filter.Strategy})
+	}
+
 	if filter.Offset != 0 {
 		query = query.Offset(uint64(filter.Offset))
 	}
@@ -94,7 +98,8 @@ func scanJob(row libpgx.Scanner) (*jobs.Job, error) {
 	jobFromDB := jobs.Job{}
 
 	err := row.Scan(
-		&jobFromDB.UUID, &jobFromDB.Status, &jobFromDB.Filename, &jobFromDB.CreatedAt, &jobFromDB.UpdatedAt)
+		&jobFromDB.UUID, &jobFromDB.Status, &jobFromDB.Filename, &jobFromDB.Strategy,
+		&jobFromDB.CreatedAt, &jobFromDB.UpdatedAt)
 	if err != nil {
 		return nil, fmt.Errorf("error fetch jobs from db: %w", err)
 	}
@@ -103,7 +108,7 @@ func scanJob(row libpgx.Scanner) (*jobs.Job, error) {
 }
 
 const queryGetJobByUUID = `
-SELECT "uuid", "status", "file_name", "created_at", "updated_at"
+SELECT "uuid", "status", "file_name", "strategy","created_at", "updated_at"
 FROM jobs
 WHERE uuid = $1;
 `
@@ -119,7 +124,7 @@ func (r *Repository) GetJobByUUID(ctx context.Context, jobUUID string) (*jobs.Jo
 }
 
 const queryGetJobToProcess = `
-SELECT "uuid", "status", "file_name", "created_at", "updated_at"
+SELECT "uuid", "status", "file_name", "strategy", "created_at", "updated_at"
 FROM jobs
 WHERE "status" IN (%s)
 ORDER BY created_at

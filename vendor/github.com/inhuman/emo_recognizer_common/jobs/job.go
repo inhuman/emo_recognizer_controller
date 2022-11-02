@@ -24,6 +24,7 @@ type Job struct {
 	UUID      string
 	Status    JobStatus
 	Filename  string
+	Strategy  Strategy
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -40,9 +41,11 @@ func (j *Job) CleanFileName() string {
 
 func StatusesToProcess() []JobStatus {
 	return []JobStatus{
-		JobStatusPlanned,
+		JobStatusFileUploaded,
 		JobStatusNoiseWrapComplete,
 		JobStatusSpeechRecognizeComplete,
 	}
 
 }
+
+type Strategy string

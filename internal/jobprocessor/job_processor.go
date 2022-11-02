@@ -48,6 +48,8 @@ func (jp *JobProcessor) Run(ctx context.Context, conf config.JobProcessor) {
 		select {
 		case <-ticker.C:
 
+			jp.logger.Info("job processor tick")
+
 			jobForProcess, err := jp.repo.GetJobToProcess(ctx)
 			if err != nil {
 				jp.logger.Error("error get job to process: %w", zap.Error(err))
@@ -73,7 +75,7 @@ func (jp *JobProcessor) Run(ctx context.Context, conf config.JobProcessor) {
 				zap.String("strategy name", string(strategy.Name())),
 			)
 
-			err = strategy.Process(jobForProcess)
+			err = strategy.Process(ctx, jobForProcess)
 			if err != nil {
 				jp.logger.Error("job process error",
 					zap.String("job status", string(jobForProcess.Status)),

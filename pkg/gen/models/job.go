@@ -29,6 +29,9 @@ type Job struct {
 	// status
 	Status JobStatus `json:"Status,omitempty"`
 
+	// strategy
+	Strategy Strategy `json:"Strategy,omitempty"`
+
 	// UUID
 	UUID string `json:"UUID,omitempty"`
 
@@ -46,6 +49,10 @@ func (m *Job) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateStatus(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateStrategy(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -88,6 +95,23 @@ func (m *Job) validateStatus(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *Job) validateStrategy(formats strfmt.Registry) error {
+	if swag.IsZero(m.Strategy) { // not required
+		return nil
+	}
+
+	if err := m.Strategy.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("Strategy")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("Strategy")
+		}
+		return err
+	}
+
+	return nil
+}
+
 func (m *Job) validateUpdatedAt(formats strfmt.Registry) error {
 	if swag.IsZero(m.UpdatedAt) { // not required
 		return nil
@@ -108,6 +132,10 @@ func (m *Job) ContextValidate(ctx context.Context, formats strfmt.Registry) erro
 		res = append(res, err)
 	}
 
+	if err := m.contextValidateStrategy(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -121,6 +149,20 @@ func (m *Job) contextValidateStatus(ctx context.Context, formats strfmt.Registry
 			return ve.ValidateName("Status")
 		} else if ce, ok := err.(*errors.CompositeError); ok {
 			return ce.ValidateName("Status")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *Job) contextValidateStrategy(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.Strategy.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("Strategy")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("Strategy")
 		}
 		return err
 	}

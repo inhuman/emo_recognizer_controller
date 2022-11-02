@@ -81,9 +81,11 @@ func (s *S3) connect() error {
 		return ErrBucketNotExists
 	}
 
-	err = minioClient.MakeBucket(ctxWithTimeout, s.bucketName, minio.MakeBucketOptions{})
-	if err != nil {
-		return fmt.Errorf("error create bucket with name %s: %w", s.bucketName, err)
+	if !b && s.createBucket {
+		err = minioClient.MakeBucket(ctxWithTimeout, s.bucketName, minio.MakeBucketOptions{})
+		if err != nil {
+			return fmt.Errorf("error create bucket with name %s: %w", s.bucketName, err)
+		}
 	}
 
 	s.client = minioClient

@@ -50,6 +50,10 @@ type getJobsParams struct {
 	// in:query
 	Status string `json:"status"`
 
+	// Strategy
+	// in:query
+	Strategy string `json:"strategy"`
+
 	// Limit
 	// in:query
 	Limit int `json:"limit"`

@@ -14,6 +14,7 @@ require (
 	github.com/golang-migrate/migrate/v4 v4.15.2
 	github.com/google/uuid v1.3.0
 	github.com/inhuman/emo_recognizer_common v0.0.1
+	github.com/inhuman/noise_wrapper v0.0.0-00010101000000-000000000000
 	github.com/jackc/pgx/v4 v4.11.0
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/joho/godotenv v1.4.0
@@ -94,4 +95,8 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/inhuman/emo_recognizer_common => /home/id/go/src/github.com/inhuman/emo_recognizer_common
+replace (
+	github.com/inhuman/emo_recognizer_common => /home/id/go/src/github.com/inhuman/emo_recognizer_common
+	github.com/inhuman/noise_wrapper => /home/id/go/src/github.com/inhuman/noise_wrapper
+
+)

@@ -15,12 +15,12 @@ import (
 	"net/http"
 )
 
-type UploadFileHandler struct {
+type CreateJobHandler struct {
 	CommonHandler
 }
 
-func NewUploadFileHandler(logger *zap.Logger, jobProcessor *jobprocessor.JobProcessor) *UploadFileHandler {
-	return &UploadFileHandler{
+func NewCreateJobHandler(logger *zap.Logger, jobProcessor *jobprocessor.JobProcessor) *CreateJobHandler {
+	return &CreateJobHandler{
 		CommonHandler{
 			logger:       logger,
 			jobProcessor: jobProcessor,
@@ -28,7 +28,7 @@ func NewUploadFileHandler(logger *zap.Logger, jobProcessor *jobprocessor.JobProc
 	}
 }
 
-func (u *UploadFileHandler) Handle(params job.CreateJobParams) middleware.Responder {
+func (u *CreateJobHandler) Handle(params job.CreateJobParams) middleware.Responder {
 	jobToCreate := jobs.Job{
 		Filename: "test.wav",
 	}
@@ -48,8 +48,8 @@ func (u *UploadFileHandler) Handle(params job.CreateJobParams) middleware.Respon
 	if err != nil {
 		errRespBuilder := CommonErrorResponse().WithHTTPCode(http.StatusInternalServerError).WithError(err)
 
-		updStatusErr := u.jobProcessor.Repo().
-			UpdateStatusByUUID(params.HTTPRequest.Context(), jobToCreate.UUID, jobs.JobStatusSpeechRecognizeError)
+		updStatusErr := u.jobProcessor.Repo(). // TODO: fix status to obStatusFileUploadError
+							UpdateStatusByUUID(params.HTTPRequest.Context(), jobToCreate.UUID, jobs.JobStatusSpeechRecognizeError)
 		if err != nil {
 			errRespBuilder.WithDetails(updStatusErr.Error())
 		}

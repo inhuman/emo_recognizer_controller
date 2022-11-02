@@ -4,6 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	httptransport "github.com/go-openapi/runtime/client"
+	"github.com/go-openapi/strfmt"
+	nwclient "github.com/inhuman/noise_wrapper/pkg/gen/client"
+	"time"
 
 	"github.com/go-openapi/loads"
 	"github.com/golang-migrate/migrate/v4"
@@ -25,6 +29,9 @@ import (
 )
 
 func main() {
+
+	time.Sleep(5 * time.Second)
+
 	ctx := context.Background()
 
 	logger := zap.NewExample()
@@ -58,21 +65,34 @@ func main() {
 		if !errors.Is(err, migrate.ErrNoChange) {
 			panicErr(err, logger)
 		}
+
+		logger.Info("migrations applied")
 	}
 
 	dbRepo := db.NewRepository(pgxPool, logger)
-
-	strategyChooser := jobprocessor.NewStrategyChooser()
-	strategyChooser.AddStrategy(jobprocessor.StrategyDefault, jobprocessor.NewDefaultStrategy())
 
 	fileStorage, err := s3.NewS3(
 		s3.WithEndpoint(appConfig.S3.Endpoint),
 		s3.WithBucketName(appConfig.S3.Bucket),
 		s3.WithAccessKey(appConfig.S3.AccessKey),
 		s3.WithSecretKey(appConfig.S3.SecretKey),
+		s3.WithSecure(appConfig.S3.Secure),
 		s3.WithCreateBucket(true),
 	)
 	panicErr(err, logger)
+
+	transport := httptransport.New(appConfig.Services.NoiseWrapper.Address, "", []string{"http"})
+	noiseWrapperClient := nwclient.New(transport, strfmt.Default)
+
+	defaultStrategy := jobprocessor.NewDefaultStrategy(jobprocessor.DefaultStrategyOps{
+		Repo:               dbRepo,
+		NoiseWrapperClient: noiseWrapperClient,
+		StorageClient:      fileStorage,
+		Logger:             logger,
+	})
+
+	strategyChooser := jobprocessor.NewStrategyChooser()
+	strategyChooser.AddStrategy(jobprocessor.StrategyDefault, defaultStrategy)
 
 	jobsProcessor := jobprocessor.NewJobProcessor(jobprocessor.Opts{
 		Repo:            dbRepo,
@@ -121,6 +141,8 @@ func main() {
 	}
 
 	server.ConfigureAPI()
+
+	go jobsProcessor.Run(ctx, appConfig.JobProcessor)
 
 	err = server.Serve()
 	if err != nil {

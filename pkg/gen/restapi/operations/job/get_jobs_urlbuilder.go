@@ -15,9 +15,10 @@ import (
 
 // GetJobsURL generates an URL for the get jobs operation
 type GetJobsURL struct {
-	Limit  *int64
-	Offset *int64
-	Status *string
+	Limit    *int64
+	Offset   *int64
+	Status   *string
+	Strategy *string
 
 	_basePath string
 	// avoid unkeyed usage
@@ -72,6 +73,14 @@ func (o *GetJobsURL) Build() (*url.URL, error) {
 	}
 	if statusQ != "" {
 		qs.Set("status", statusQ)
+	}
+
+	var strategyQ string
+	if o.Strategy != nil {
+		strategyQ = *o.Strategy
+	}
+	if strategyQ != "" {
+		qs.Set("strategy", strategyQ)
 	}
 
 	_result.RawQuery = qs.Encode()

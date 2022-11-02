@@ -14,16 +14,16 @@ COPY . .
 RUN go build -mod=vendor -o /emo_recognizer_controller ./cmd/emo_recognizer_controller
 
 COPY ./migrations /migrations
-#
-#FROM scratch
-#
-#COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
-#
-#COPY --from=builder /etc/localtime /etc/localtime
-#
-#COPY --from=builder /emo_recognizer_controller /emo_recognizer_controller
-#
-#COPY --from=builder /migrations /migrations
+
+FROM scratch
+
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+
+COPY --from=builder /etc/localtime /etc/localtime
+
+COPY --from=builder /emo_recognizer_controller /emo_recognizer_controller
+
+COPY --from=builder /migrations /migrations
 
 ENTRYPOINT ["/emo_recognizer_controller"]
 

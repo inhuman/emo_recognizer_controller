@@ -7,9 +7,10 @@ import (
 )
 
 type GetJobsFilter struct {
-	Status jobs.JobStatus
-	Limit  int
-	Offset int
+	Status   jobs.JobStatus
+	Strategy jobs.Strategy
+	Limit    int
+	Offset   int
 }
 type Repository interface {
 	GetJobs(ctx context.Context, filter GetJobsFilter) ([]*jobs.Job, error)

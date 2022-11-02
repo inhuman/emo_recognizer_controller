@@ -41,6 +41,13 @@ func init() {
             "in": "query"
           },
           {
+            "type": "string",
+            "x-go-name": "Strategy",
+            "description": "Strategy",
+            "name": "strategy",
+            "in": "query"
+          },
+          {
             "type": "integer",
             "format": "int64",
             "x-go-name": "Limit",
@@ -182,6 +189,9 @@ func init() {
         "Status": {
           "$ref": "#/definitions/JobStatus"
         },
+        "Strategy": {
+          "$ref": "#/definitions/Strategy"
+        },
         "UUID": {
           "type": "string"
         },
@@ -201,6 +211,10 @@ func init() {
       "type": "object",
       "title": "Reader is the interface that wraps the basic Read method.",
       "x-go-package": "io"
+    },
+    "Strategy": {
+      "type": "string",
+      "x-go-package": "github.com/inhuman/emo_recognizer_common/jobs"
     },
     "commonErrorResponse": {
       "type": "object",
@@ -312,6 +326,13 @@ func init() {
             "x-go-name": "Status",
             "description": "Status",
             "name": "status",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "Strategy",
+            "description": "Strategy",
+            "name": "strategy",
             "in": "query"
           },
           {
@@ -506,6 +527,9 @@ func init() {
         "Status": {
           "$ref": "#/definitions/JobStatus"
         },
+        "Strategy": {
+          "$ref": "#/definitions/Strategy"
+        },
         "UUID": {
           "type": "string"
         },
@@ -525,6 +549,10 @@ func init() {
       "type": "object",
       "title": "Reader is the interface that wraps the basic Read method.",
       "x-go-package": "io"
+    },
+    "Strategy": {
+      "type": "string",
+      "x-go-package": "github.com/inhuman/emo_recognizer_common/jobs"
     },
     "commonErrorResponse": {
       "type": "object",

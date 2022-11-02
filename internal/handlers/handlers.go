@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/go-openapi/runtime"
 	"github.com/inhuman/emo_recognizer_controller/internal/jobprocessor"
 	"github.com/inhuman/emo_recognizer_controller/pkg/gen/models"
 	"github.com/inhuman/emo_recognizer_controller/pkg/gen/restapi/operations"
@@ -13,7 +14,10 @@ type SetupOpts struct {
 }
 
 func SetupAPI(api *operations.EmotionsRecognizerAPI, opts *SetupOpts) {
-	api.JobCreateJobHandler = NewUploadFileHandler(opts.Logger, opts.JobsProcessor)
+	api.RegisterConsumer("application/json", runtime.JSONConsumer())
+	api.RegisterProducer("application/json", runtime.JSONProducer())
+
+	api.JobCreateJobHandler = NewCreateJobHandler(opts.Logger, opts.JobsProcessor)
 	api.JobGetJobsHandler = NewGetJobsHandler(opts.Logger, opts.JobsProcessor)
 	api.JobGetJobHandler = NewGetJobHandler(opts.Logger, opts.JobsProcessor)
 	api.JobGetJobOriginalFileHandler = NewGetJobFileHandler(opts.Logger, opts.JobsProcessor)

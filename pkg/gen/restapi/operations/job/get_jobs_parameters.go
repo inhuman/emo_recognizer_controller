@@ -44,6 +44,10 @@ type GetJobsParams struct {
 	  In: query
 	*/
 	Status *string
+	/*Strategy
+	  In: query
+	*/
+	Strategy *string
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -69,6 +73,11 @@ func (o *GetJobsParams) BindRequest(r *http.Request, route *middleware.MatchedRo
 
 	qStatus, qhkStatus, _ := qs.GetOK("status")
 	if err := o.bindStatus(qStatus, qhkStatus, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
+	qStrategy, qhkStrategy, _ := qs.GetOK("strategy")
+	if err := o.bindStrategy(qStrategy, qhkStrategy, route.Formats); err != nil {
 		res = append(res, err)
 	}
 	if len(res) > 0 {
@@ -137,6 +146,24 @@ func (o *GetJobsParams) bindStatus(rawData []string, hasKey bool, formats strfmt
 		return nil
 	}
 	o.Status = &raw
+
+	return nil
+}
+
+// bindStrategy binds and validates parameter Strategy from query.
+func (o *GetJobsParams) bindStrategy(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: false
+	// AllowEmptyValue: false
+
+	if raw == "" { // empty values pass all other validations
+		return nil
+	}
+	o.Strategy = &raw
 
 	return nil
 }

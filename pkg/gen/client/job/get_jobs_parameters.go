@@ -84,6 +84,12 @@ type GetJobsParams struct {
 	*/
 	Status *string
 
+	/* Strategy.
+
+	   Strategy
+	*/
+	Strategy *string
+
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
@@ -170,6 +176,17 @@ func (o *GetJobsParams) SetStatus(status *string) {
 	o.Status = status
 }
 
+// WithStrategy adds the strategy to the get jobs params
+func (o *GetJobsParams) WithStrategy(strategy *string) *GetJobsParams {
+	o.SetStrategy(strategy)
+	return o
+}
+
+// SetStrategy adds the strategy to the get jobs params
+func (o *GetJobsParams) SetStrategy(strategy *string) {
+	o.Strategy = strategy
+}
+
 // WriteToRequest writes these params to a swagger request
 func (o *GetJobsParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
 
@@ -224,6 +241,23 @@ func (o *GetJobsParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Regis
 		if qStatus != "" {
 
 			if err := r.SetQueryParam("status", qStatus); err != nil {
+				return err
+			}
+		}
+	}
+
+	if o.Strategy != nil {
+
+		// query param strategy
+		var qrStrategy string
+
+		if o.Strategy != nil {
+			qrStrategy = *o.Strategy
+		}
+		qStrategy := qrStrategy
+		if qStrategy != "" {
+
+			if err := r.SetQueryParam("strategy", qStrategy); err != nil {
 				return err
 			}
 		}
