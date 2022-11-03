@@ -7,6 +7,7 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 	nwclient "github.com/inhuman/noise_wrapper/pkg/gen/client"
+	srclient "github.com/inhuman/speech-recognizer/pkg/gen/client"
 	"time"
 
 	"github.com/go-openapi/loads"
@@ -81,14 +82,18 @@ func main() {
 	)
 	panicErr(err, logger)
 
-	transport := httptransport.New(appConfig.Services.NoiseWrapper.Address, "", []string{"http"})
-	noiseWrapperClient := nwclient.New(transport, strfmt.Default)
+	noiseWrapperTransport := httptransport.New(appConfig.Services.NoiseWrapper.Address, "", []string{"http"})
+	noiseWrapperClient := nwclient.New(noiseWrapperTransport, strfmt.Default)
+
+	speechRecognizerTransport := httptransport.New(appConfig.Services.SpeechRecognizer.Address, "", []string{"http"})
+	speechRecognizerClient := srclient.New(speechRecognizerTransport, strfmt.Default)
 
 	defaultStrategy := jobprocessor.NewDefaultStrategy(jobprocessor.DefaultStrategyOps{
-		Repo:               dbRepo,
-		NoiseWrapperClient: noiseWrapperClient,
-		StorageClient:      fileStorage,
-		Logger:             logger,
+		Repo:                   dbRepo,
+		NoiseWrapperClient:     noiseWrapperClient,
+		SpeechRecognizerClient: speechRecognizerClient,
+		StorageClient:          fileStorage,
+		Logger:                 logger,
 	})
 
 	strategyChooser := jobprocessor.NewStrategyChooser()

@@ -139,6 +139,41 @@ func init() {
         }
       }
     },
+    "/api/v1/jobs/{Uuid}/file/clean": {
+      "get": {
+        "description": "Эндпоинт для получение очищенного файла задачи по UUID",
+        "produces": [
+          "application/octet-stream"
+        ],
+        "tags": [
+          "Job"
+        ],
+        "operationId": "getJobCleanFile",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Uuid задания",
+            "name": "Uuid",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getJobCleanFileResponse"
+          },
+          "400": {
+            "$ref": "#/responses/badDataResponse"
+          },
+          "404": {
+            "$ref": "#/responses/notFoundResponse"
+          },
+          "500": {
+            "$ref": "#/responses/internalErrorResponse"
+          }
+        }
+      }
+    },
     "/api/v1/jobs/{Uuid}/file/original": {
       "get": {
         "description": "Эндпоинт для получения файла задачи по UUID",
@@ -184,6 +219,9 @@ func init() {
           "format": "date-time"
         },
         "Filename": {
+          "type": "string"
+        },
+        "RecognizedText": {
           "type": "string"
         },
         "Status": {
@@ -256,6 +294,12 @@ func init() {
             "type": "string"
           }
         }
+      }
+    },
+    "getJobCleanFileResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Reader"
       }
     },
     "getJobOriginalFileResponse": {
@@ -465,6 +509,53 @@ func init() {
         }
       }
     },
+    "/api/v1/jobs/{Uuid}/file/clean": {
+      "get": {
+        "description": "Эндпоинт для получение очищенного файла задачи по UUID",
+        "produces": [
+          "application/octet-stream"
+        ],
+        "tags": [
+          "Job"
+        ],
+        "operationId": "getJobCleanFile",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Uuid задания",
+            "name": "Uuid",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Reader"
+            }
+          },
+          "400": {
+            "description": "Bad data (400)",
+            "schema": {
+              "$ref": "#/definitions/commonErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not found (404)",
+            "schema": {
+              "$ref": "#/definitions/commonErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal server error (500)",
+            "schema": {
+              "$ref": "#/definitions/commonErrorResponse"
+            }
+          }
+        }
+      }
+    },
     "/api/v1/jobs/{Uuid}/file/original": {
       "get": {
         "description": "Эндпоинт для получения файла задачи по UUID",
@@ -522,6 +613,9 @@ func init() {
           "format": "date-time"
         },
         "Filename": {
+          "type": "string"
+        },
+        "RecognizedText": {
           "type": "string"
         },
         "Status": {
@@ -594,6 +688,12 @@ func init() {
             "type": "string"
           }
         }
+      }
+    },
+    "getJobCleanFileResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Reader"
       }
     },
     "getJobOriginalFileResponse": {

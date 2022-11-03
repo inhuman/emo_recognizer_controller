@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS public.jobs
     status           jobStatus NOT NULL default 'planned',
     file_name        varchar(256) NOT NULL,
     strategy         strategyType NOT NULL default 'default',
+    recognized_text   text,
     created_at       timestamptz  NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at       timestamptz  NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

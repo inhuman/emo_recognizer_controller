@@ -160,11 +160,12 @@ func (g *GetJobHandler) Handle(params job.GetJobParams) middleware.Responder {
 
 func jobToDto(jobFromRepo *jobs.Job) *models.Job {
 	return &models.Job{
-		CreatedAt: strfmt.DateTime(jobFromRepo.CreatedAt),
-		Filename:  jobFromRepo.Filename,
-		Status:    models.JobStatus(jobFromRepo.Status),
-		UUID:      jobFromRepo.UUID,
-		UpdatedAt: strfmt.DateTime(jobFromRepo.UpdatedAt),
+		CreatedAt:      strfmt.DateTime(jobFromRepo.CreatedAt),
+		Filename:       jobFromRepo.Filename,
+		RecognizedText: jobFromRepo.RecognizedText,
+		Status:         models.JobStatus(jobFromRepo.Status),
+		UUID:           jobFromRepo.UUID,
+		UpdatedAt:      strfmt.DateTime(jobFromRepo.UpdatedAt),
 	}
 }
 
@@ -178,12 +179,12 @@ func jobsToDto(jobsFromRepo []*jobs.Job) []*models.Job {
 	return dtoJobs
 }
 
-type GetJobFileHandler struct {
+type GetJobOriginalFileHandler struct {
 	CommonHandler
 }
 
-func NewGetJobFileHandler(logger *zap.Logger, jobProcessor *jobprocessor.JobProcessor) *GetJobFileHandler {
-	return &GetJobFileHandler{
+func NewGetJobOriginalFileHandler(logger *zap.Logger, jobProcessor *jobprocessor.JobProcessor) *GetJobOriginalFileHandler {
+	return &GetJobOriginalFileHandler{
 		CommonHandler{
 			logger:       logger,
 			jobProcessor: jobProcessor,
@@ -191,7 +192,7 @@ func NewGetJobFileHandler(logger *zap.Logger, jobProcessor *jobprocessor.JobProc
 	}
 }
 
-func (g *GetJobFileHandler) Handle(params job.GetJobOriginalFileParams) middleware.Responder {
+func (g *GetJobOriginalFileHandler) Handle(params job.GetJobOriginalFileParams) middleware.Responder {
 
 	tempjob := &jobs.Job{UUID: params.UUID}
 
@@ -206,4 +207,33 @@ func (g *GetJobFileHandler) Handle(params job.GetJobOriginalFileParams) middlewa
 	}
 
 	return job.NewGetJobOriginalFileOK().WithPayload(rdr)
+}
+
+type GetJobCleanFileHandler struct {
+	CommonHandler
+}
+
+func NewGetJobCleanFileHandler(logger *zap.Logger, jobProcessor *jobprocessor.JobProcessor) *GetJobCleanFileHandler {
+	return &GetJobCleanFileHandler{
+		CommonHandler{
+			logger:       logger,
+			jobProcessor: jobProcessor,
+		},
+	}
+}
+
+func (g *GetJobCleanFileHandler) Handle(params job.GetJobCleanFileParams) middleware.Responder {
+	tempjob := &jobs.Job{UUID: params.UUID}
+
+	rdr, err := g.jobProcessor.FileStorage().Read(params.HTTPRequest.Context(), tempjob.CleanFileName())
+	if err != nil {
+		return job.NewGetJobCleanFileInternalServerError().WithPayload(
+			CommonErrorResponse().
+				WithHTTPCode(http.StatusInternalServerError).
+				WithError(err).
+				Build(),
+		)
+	}
+
+	return job.NewGetJobCleanFileOK().WithPayload(rdr)
 }

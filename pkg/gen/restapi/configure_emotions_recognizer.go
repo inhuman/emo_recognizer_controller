@@ -50,6 +50,11 @@ func configureAPI(api *operations.EmotionsRecognizerAPI) http.Handler {
 			return middleware.NotImplemented("operation job.GetJob has not yet been implemented")
 		})
 	}
+	if api.JobGetJobCleanFileHandler == nil {
+		api.JobGetJobCleanFileHandler = job.GetJobCleanFileHandlerFunc(func(params job.GetJobCleanFileParams) middleware.Responder {
+			return middleware.NotImplemented("operation job.GetJobCleanFile has not yet been implemented")
+		})
+	}
 	if api.JobGetJobOriginalFileHandler == nil {
 		api.JobGetJobOriginalFileHandler = job.GetJobOriginalFileHandlerFunc(func(params job.GetJobOriginalFileParams) middleware.Responder {
 			return middleware.NotImplemented("operation job.GetJobOriginalFile has not yet been implemented")

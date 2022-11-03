@@ -34,6 +34,8 @@ type ClientService interface {
 
 	GetJob(params *GetJobParams, opts ...ClientOption) (*GetJobOK, error)
 
+	GetJobCleanFile(params *GetJobCleanFileParams, opts ...ClientOption) (*GetJobCleanFileOK, error)
+
 	GetJobOriginalFile(params *GetJobOriginalFileParams, opts ...ClientOption) (*GetJobOriginalFileOK, error)
 
 	GetJobs(params *GetJobsParams, opts ...ClientOption) (*GetJobsOK, error)
@@ -114,6 +116,44 @@ func (a *Client) GetJob(params *GetJobParams, opts ...ClientOption) (*GetJobOK, 
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for getJob: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+GetJobCleanFile Эндпоинт для получение очищенного файла задачи по UUID
+*/
+func (a *Client) GetJobCleanFile(params *GetJobCleanFileParams, opts ...ClientOption) (*GetJobCleanFileOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetJobCleanFileParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "getJobCleanFile",
+		Method:             "GET",
+		PathPattern:        "/api/v1/jobs/{Uuid}/file/clean",
+		ProducesMediaTypes: []string{"application/octet-stream"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetJobCleanFileReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetJobCleanFileOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for getJobCleanFile: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

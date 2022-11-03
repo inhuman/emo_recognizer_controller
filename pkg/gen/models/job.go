@@ -26,6 +26,9 @@ type Job struct {
 	// filename
 	Filename string `json:"Filename,omitempty"`
 
+	// recognized text
+	RecognizedText string `json:"RecognizedText,omitempty"`
+
 	// status
 	Status JobStatus `json:"Status,omitempty"`
 

@@ -20,7 +20,8 @@ func SetupAPI(api *operations.EmotionsRecognizerAPI, opts *SetupOpts) {
 	api.JobCreateJobHandler = NewCreateJobHandler(opts.Logger, opts.JobsProcessor)
 	api.JobGetJobsHandler = NewGetJobsHandler(opts.Logger, opts.JobsProcessor)
 	api.JobGetJobHandler = NewGetJobHandler(opts.Logger, opts.JobsProcessor)
-	api.JobGetJobOriginalFileHandler = NewGetJobFileHandler(opts.Logger, opts.JobsProcessor)
+	api.JobGetJobOriginalFileHandler = NewGetJobOriginalFileHandler(opts.Logger, opts.JobsProcessor)
+	api.JobGetJobCleanFileHandler = NewGetJobCleanFileHandler(opts.Logger, opts.JobsProcessor)
 }
 
 type CommonHandler struct {

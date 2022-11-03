@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"strings"
@@ -54,7 +55,7 @@ func (r *Repository) GetJobs(ctx context.Context, filter repository.GetJobsFilte
 }
 
 func getQueryGetJobs(filter repository.GetJobsFilter) (queryString string, args []interface{}, err error) {
-	query := sq.Select("uuid", "status", "file_name", "strategy", "created_at", "updated_at").
+	query := sq.Select("uuid", "status", "file_name", "strategy", "recognized_text", "created_at", "updated_at").
 		From("jobs")
 
 	query = query.PlaceholderFormat(sq.Dollar)
@@ -97,18 +98,24 @@ func applyFilterToQuery(query sq.SelectBuilder, filter repository.GetJobsFilter)
 func scanJob(row libpgx.Scanner) (*jobs.Job, error) {
 	jobFromDB := jobs.Job{}
 
+	var recognizedText sql.NullString
+
 	err := row.Scan(
-		&jobFromDB.UUID, &jobFromDB.Status, &jobFromDB.Filename, &jobFromDB.Strategy,
+		&jobFromDB.UUID, &jobFromDB.Status, &jobFromDB.Filename, &jobFromDB.Strategy, &recognizedText,
 		&jobFromDB.CreatedAt, &jobFromDB.UpdatedAt)
 	if err != nil {
 		return nil, fmt.Errorf("error fetch jobs from db: %w", err)
+	}
+
+	if recognizedText.Valid {
+		jobFromDB.RecognizedText = recognizedText.String
 	}
 
 	return &jobFromDB, nil
 }
 
 const queryGetJobByUUID = `
-SELECT "uuid", "status", "file_name", "strategy","created_at", "updated_at"
+SELECT "uuid", "status", "file_name", "strategy", "recognized_text", "created_at", "updated_at"
 FROM jobs
 WHERE uuid = $1;
 `
@@ -124,7 +131,7 @@ func (r *Repository) GetJobByUUID(ctx context.Context, jobUUID string) (*jobs.Jo
 }
 
 const queryGetJobToProcess = `
-SELECT "uuid", "status", "file_name", "strategy", "created_at", "updated_at"
+SELECT "uuid", "status", "file_name", "strategy", "recognized_text", "created_at", "updated_at"
 FROM jobs
 WHERE "status" IN (%s)
 ORDER BY created_at
@@ -175,6 +182,20 @@ WHERE "uuid" = $2
 
 func (r *Repository) UpdateStatusByUUID(ctx context.Context, jobUUID string, status jobs.JobStatus) error {
 	_, err := r.db.Exec(ctx, queryUpdateStatusByUUID, status, jobUUID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+const queryUpdateRecognizedText = `
+UPDATE jobs SET "recognized_text" = $1
+WHERE "uuid" = $2
+`
+
+func (r *Repository) UpdateRecognizedText(ctx context.Context, jobUUID string, text string) error {
+	_, err := r.db.Exec(ctx, queryUpdateRecognizedText, text, jobUUID)
 	if err != nil {
 		return err
 	}

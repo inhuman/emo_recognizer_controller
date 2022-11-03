@@ -107,15 +107,41 @@ type getJobResponse struct {
 //   500: internalErrorResponse
 
 // swagger:parameters getJobOriginalFile
-type getJobFileParams struct {
+type getJobOriginalFileParams struct {
 	// Uuid задания
 	// in:path
 	Uuid string
 }
 
 // swagger:response getJobOriginalFileResponse
-type getJobFileResponse struct {
-	// Задание на обработку
+type getJobOriginalFileResponse struct {
+	// Оригинальный файд
+	// in:body
+	Body io.Reader
+}
+
+// swagger:route GET /api/v1/jobs/{Uuid}/file/clean Job getJobCleanFile
+// Эндпоинт для получение очищенного файла задачи по UUID
+//
+// Produces:
+// - application/octet-stream
+//
+// responses:
+//   200: getJobCleanFileResponse
+//   400: badDataResponse
+//	 404: notFoundResponse
+//   500: internalErrorResponse
+
+// swagger:parameters getJobCleanFile
+type getJobCleanFileParams struct {
+	// Uuid задания
+	// in:path
+	Uuid string
+}
+
+// swagger:response getJobCleanFileResponse
+type getJobCleanFileResponse struct {
+	// Очищенный файл
 	// in:body
 	Body io.Reader
 }

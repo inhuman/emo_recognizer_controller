@@ -21,12 +21,13 @@ const (
 )
 
 type Job struct {
-	UUID      string
-	Status    JobStatus
-	Filename  string
-	Strategy  Strategy
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	UUID           string
+	Status         JobStatus
+	Filename       string
+	RecognizedText string
+	Strategy       Strategy
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
 }
 
 const ext = "wav"

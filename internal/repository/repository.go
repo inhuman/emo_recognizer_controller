@@ -18,4 +18,5 @@ type Repository interface {
 	GetJobToProcess(ctx context.Context) (*jobs.Job, error)
 	CreateJob(ctx context.Context, jobToCreate *jobs.Job) error
 	UpdateStatusByUUID(ctx context.Context, jobUUID string, status jobs.JobStatus) error
+	UpdateRecognizedText(ctx context.Context, jobUUID string, text string) error
 }

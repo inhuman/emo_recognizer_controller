@@ -50,6 +50,9 @@ func NewEmotionsRecognizerAPI(spec *loads.Document) *EmotionsRecognizerAPI {
 		JobGetJobHandler: job.GetJobHandlerFunc(func(params job.GetJobParams) middleware.Responder {
 			return middleware.NotImplemented("operation job.GetJob has not yet been implemented")
 		}),
+		JobGetJobCleanFileHandler: job.GetJobCleanFileHandlerFunc(func(params job.GetJobCleanFileParams) middleware.Responder {
+			return middleware.NotImplemented("operation job.GetJobCleanFile has not yet been implemented")
+		}),
 		JobGetJobOriginalFileHandler: job.GetJobOriginalFileHandlerFunc(func(params job.GetJobOriginalFileParams) middleware.Responder {
 			return middleware.NotImplemented("operation job.GetJobOriginalFile has not yet been implemented")
 		}),
@@ -96,6 +99,8 @@ type EmotionsRecognizerAPI struct {
 	JobCreateJobHandler job.CreateJobHandler
 	// JobGetJobHandler sets the operation handler for the get job operation
 	JobGetJobHandler job.GetJobHandler
+	// JobGetJobCleanFileHandler sets the operation handler for the get job clean file operation
+	JobGetJobCleanFileHandler job.GetJobCleanFileHandler
 	// JobGetJobOriginalFileHandler sets the operation handler for the get job original file operation
 	JobGetJobOriginalFileHandler job.GetJobOriginalFileHandler
 	// JobGetJobsHandler sets the operation handler for the get jobs operation
@@ -182,6 +187,9 @@ func (o *EmotionsRecognizerAPI) Validate() error {
 	}
 	if o.JobGetJobHandler == nil {
 		unregistered = append(unregistered, "job.GetJobHandler")
+	}
+	if o.JobGetJobCleanFileHandler == nil {
+		unregistered = append(unregistered, "job.GetJobCleanFileHandler")
 	}
 	if o.JobGetJobOriginalFileHandler == nil {
 		unregistered = append(unregistered, "job.GetJobOriginalFileHandler")
@@ -285,6 +293,10 @@ func (o *EmotionsRecognizerAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/api/v1/jobs/{Uuid}"] = job.NewGetJob(o.context, o.JobGetJobHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/api/v1/jobs/{Uuid}/file/clean"] = job.NewGetJobCleanFile(o.context, o.JobGetJobCleanFileHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

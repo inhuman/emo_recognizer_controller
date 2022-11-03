@@ -2,8 +2,6 @@ version: "3.9"
 services:
   controller:
     build: .
-    ports:
-      - "8881:80"
     environment:
       PORT: 80
       HOST: 0.0.0.0
@@ -21,22 +19,10 @@ services:
       S3_PUBLIC_HOST_SCHEMA: http
       S3_SECURE: "false"
       NOISE_WRAPPER_ADDRESS: "noise_wrapper"
-  postgres:
-    image: "postgres:9.6"
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_DB: postgres
-      POSTGRES_PASSWORD: 123
-  s3:
-    image: "minio/minio:latest"
-    command:
-      - server
-      - /data
+      SPEECH_RECOGNIZER_ADDRESS: "speech_recognizer"
     ports:
-      - "9000:9000"
-    environment:
-      MINIO_ROOT_USER: root
-      MINIO_ROOT_PASSWORD: root_password
+      - "8881:80"
+
   speech_recognizer:
     build: ./../speech-recognizer
     environment:
@@ -44,6 +30,7 @@ services:
       HOST: 0.0.0.0
     ports:
       - "8882:80"
+
   noise_wrapper:
     build: ./../noise_wrapper
     environment:
@@ -58,3 +45,21 @@ services:
       S3_SECURE: "false"
     ports:
       - "8883:80"
+
+  s3:
+    image: "minio/minio:latest"
+    command:
+      - server
+      - /data
+    ports:
+      - "9000:9000"
+    environment:
+      MINIO_ROOT_USER: root
+      MINIO_ROOT_PASSWORD: root_password
+
+  postgres:
+    image: "postgres:9.6"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: 123
