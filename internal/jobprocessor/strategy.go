@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-openapi/runtime"
-	"github.com/inhuman/noise_wrapper/pkg/gen/client/noise_wrap"
 	"github.com/inhuman/speech-recognizer/pkg/gen/client/speech_to_text"
 	"go.uber.org/zap"
 	"sync"
@@ -86,45 +85,6 @@ func NewDefaultStrategy(opts DefaultStrategyOps) *DefaultStrategy {
 func (d *DefaultStrategy) Process(ctx context.Context, jobToProcess *jobs.Job) error {
 	switch jobToProcess.Status {
 	case jobs.JobStatusFileUploaded:
-
-		contextWithTimeout, cancel := context.WithTimeout(context.Background(), time.Second*120)
-		defer cancel()
-
-		err := d.repo.UpdateStatusByUUID(ctx, jobToProcess.UUID, jobs.JobStatusNoiseWrapStarted)
-		if err != nil {
-			return fmt.Errorf("error update job status")
-		}
-
-		file, err := d.storageClient.Read(ctx, jobToProcess.OriginalFileName())
-		if err != nil {
-			return fmt.Errorf("can not download original file from storage: %w", err)
-		}
-
-		resp, err := d.noiseWrapperClient.NoiseWrap.UploadFile(&noise_wrap.UploadFileParams{
-			File:    runtime.NamedReader("file", file),
-			UUID:    jobToProcess.UUID,
-			Context: contextWithTimeout,
-		})
-		if err != nil {
-			return fmt.Errorf("can not upload file to noise wrapper: %w", err)
-		}
-
-		d.logger.Info("successful upload file to noise wrapper")
-
-		status := jobs.JobStatusNoiseWrapError
-
-		if resp.IsSuccess() {
-			status = jobs.JobStatusNoiseWrapComplete
-		}
-
-		err = d.repo.UpdateStatusByUUID(ctx, jobToProcess.UUID, status)
-		if err != nil {
-			return fmt.Errorf("error update job status")
-		}
-
-		return nil
-
-	case jobs.JobStatusNoiseWrapComplete:
 		contextWithTimeout, cancel := context.WithTimeout(context.Background(), time.Second*120)
 		defer cancel()
 
@@ -133,7 +93,7 @@ func (d *DefaultStrategy) Process(ctx context.Context, jobToProcess *jobs.Job) e
 			return fmt.Errorf("error update job status")
 		}
 
-		file, err := d.storageClient.Read(ctx, jobToProcess.CleanFileName())
+		file, err := d.storageClient.Read(ctx, jobToProcess.OriginalFileName())
 		if err != nil {
 			return fmt.Errorf("can not download clean file from storage: %w", err)
 		}
